@@ -48,16 +48,16 @@ fn main() {
         let ptr = bytes.get_mut(j).unwrap();
         let mut byte = (*ptr) << 2;
         byte |= lng_b << 1 | lat_b;
-        println!(
-            "[i={:04}, j={:04}] ptr={:08b}, byte={:08b}, lat_ptr={:08b}, lng_ptr={:08b}",
-            i, j, ptr, byte, lat_ptr, lng_ptr
-        );
+        // println!(
+        //     "[i={:04}, j={:04}] ptr={:08b}, byte={:08b}, lat_ptr={:08b}, lng_ptr={:08b}",
+        //     i, j, ptr, byte, lat_ptr, lng_ptr
+        // );
         *ptr = byte;
     }
-    for b in &bytes {
-        print!("{:08b} ", b);
-    }
-    println!();
+    // for b in &bytes {
+    //     print!("{:08b} ", b);
+    // }
+    // println!();
     println!("{}", base32encode(&bytes));
 }
 
@@ -134,10 +134,10 @@ fn trace_binary_search(value: f64, range: (f64, f64), bits: usize) -> Vec<u8> {
             byte |= 1u8;
             lower = piv;
         }
-        println!(
-            "[iter={:04}] ptr={:08b}, byte={:08b}, lower={:08}, higher={:08}, piv={:08}",
-            i, ptr, byte, lower, higher, piv
-        );
+        // println!(
+        //     "[iter={:04}] ptr={:08b}, byte={:08b}, lower={:08}, higher={:08}, piv={:08}",
+        //     i, ptr, byte, lower, higher, piv
+        // );
         *ptr = byte;
         piv = (lower + higher) / 2.0;
     }
