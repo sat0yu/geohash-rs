@@ -112,3 +112,63 @@ fn trace_binary_search(value: f64, range: (f64, f64), bits: usize) -> Vec<u8> {
     }
     buf
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn encode_translates_latitude_and_longitude_to_geohash() {
+        let cases = vec![
+            ((57.64911, 10.40744, 8), "u4p".to_string()),
+            ((57.64911, 10.40744, 12), "u4pru0".to_string()),
+            ((57.64911, 10.40744, 16), "u4pruy".to_string()),
+            ((57.64911, 10.40744, 32), "u4pruydqqvj8".to_string()),
+        ];
+        for ((lat, lng, bits), expected) in cases {
+            assert_eq!(encode(lat, lng, bits), expected);
+        }
+    }
+
+    #[test]
+    fn base32encode_converts_bytes_to_32ghs_string() {
+        let cases = vec![
+            (vec![0b01101111, 0b11110000, 0b01000001], "ezs4".to_string()),
+            (
+                vec![0b01101111, 0b11110000, 0b01000001, 0b00000000],
+                "ezs420".to_string(),
+            ),
+            (
+                vec![0b01101111, 0b11110000, 0b01000001, 0b01000100],
+                "ezs42j".to_string(),
+            ),
+            (
+                // the trailing last n-bits (n < 5) are ignored
+                vec![0b01101111, 0b11110000, 0b01000001, 0b01000111],
+                "ezs42j".to_string(),
+            ),
+            (
+                vec![0b01101111, 0b11110000, 0b01000001, 0b01000111, 0b00011111],
+                "ezs42jsz".to_string(),
+            ),
+        ];
+        for (bytes, expected) in cases {
+            assert_eq!(base32encode(&bytes), expected);
+        }
+    }
+
+    #[test]
+    fn race_binary_search_returns_trace_of_binary_search() {
+        let cases = vec![
+            ((42.6, (-90.0, 90.0), 8), vec![0b10111100]),
+            ((-5.6, (-180.0, 180.0), 8), vec![0b01111100]),
+            ((42.6, (-90.0, 90.0), 12), vec![0b10111100, 0b10010000]),
+            ((-5.6, (-180.0, 180.0), 12), vec![0b01111100, 0b00000000]),
+            ((42.6, (-90.0, 90.0), 16), vec![0b10111100, 0b10010110]),
+            ((-5.6, (-180.0, 180.0), 16), vec![0b01111100, 0b00000100]),
+        ];
+        for ((value, range, bits), expected) in cases {
+            assert_eq!(trace_binary_search(value, range, bits), expected);
+        }
+    }
+}
