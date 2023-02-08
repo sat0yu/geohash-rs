@@ -1,39 +1,8 @@
 use std::{collections::HashMap, process::exit};
 
-const DEFAULT_BITS: usize = 16;
 const BITS_PER_BYTE: usize = 8;
 
-fn main() {
-    if std::env::args().len() != 3 && std::env::args().len() != 4 {
-        println!(
-            "usage: geohash latitude longitude [bits (default = {})]",
-            DEFAULT_BITS
-        );
-        exit(1);
-    }
-    let (lat, lng, bits) = {
-        let mut args = std::env::args();
-        args.next(); // drop the first argument (command name)
-        let lat = args.next().unwrap().parse::<f64>();
-        let lng = args.next().unwrap().parse::<f64>();
-        let bits = match args.next() {
-            Some(arg) => arg.parse::<usize>(),
-            None => Ok(DEFAULT_BITS),
-        };
-        if let Err(e) = lat {
-            println!("failed to parse latitude. {}", e);
-            exit(1);
-        }
-        if let Err(e) = lng {
-            println!("failed to parse longitude. {}", e);
-            exit(1);
-        }
-        if let Err(e) = bits {
-            println!("failed to parse bits. {}", e);
-            exit(1);
-        }
-        (lat.unwrap(), lng.unwrap(), bits.unwrap())
-    };
+pub fn encode(lat: f64, lng: f64, bits: usize) -> String {
     let lat_bytes = trace_binary_search(lat, (-90.0, 90.0), bits);
     let lng_bytes = trace_binary_search(lng, (-180.0, 180.0), bits);
     let mut bytes = vec![0u8; lat_bytes.len() * 2];
@@ -58,7 +27,7 @@ fn main() {
     //     print!("{:08b} ", b);
     // }
     // println!();
-    println!("{}", base32encode(&bytes));
+    base32encode(&bytes)
 }
 
 fn base32encode(bytes: &[u8]) -> String {
