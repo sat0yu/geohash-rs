@@ -110,6 +110,12 @@ fn trace_binary_search(value: f64, range: (f64, f64), bits: usize) -> Vec<u8> {
         *ptr = byte;
         piv = (lower + higher) / 2.0;
     }
+    let m = bits % BITS_PER_BYTE;
+    // the result is formatted with 0-padding
+    if m != 0 {
+        let ptr = buf.last_mut().unwrap();
+        *ptr <<= BITS_PER_BYTE - m;
+    }
     buf
 }
 
