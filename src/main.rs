@@ -1,4 +1,4 @@
-use std::process::exit;
+use std::{collections::HashMap, process::exit};
 
 const DEFAULT_BITS: usize = 16;
 const BITS_PER_BYTE: usize = 8;
@@ -58,6 +58,57 @@ fn main() {
         print!("{:08b} ", b);
     }
     println!();
+    println!("{}", base32encode(&bytes));
+}
+
+fn base32encode(bytes: &[u8]) -> String {
+    let map: HashMap<u8, char> = HashMap::from([
+        (0b00000, '0'),
+        (0b00001, '1'),
+        (0b00010, '2'),
+        (0b00011, '3'),
+        (0b00100, '4'),
+        (0b00101, '5'),
+        (0b00110, '6'),
+        (0b00111, '7'),
+        (0b01000, '8'),
+        (0b01001, '9'),
+        (0b01010, 'b'),
+        (0b01011, 'c'),
+        (0b01100, 'd'),
+        (0b01101, 'e'),
+        (0b01110, 'f'),
+        (0b01111, 'g'),
+        (0b10000, 'h'),
+        (0b10001, 'j'),
+        (0b10010, 'k'),
+        (0b10011, 'm'),
+        (0b10100, 'n'),
+        (0b10101, 'p'),
+        (0b10110, 'q'),
+        (0b10111, 'r'),
+        (0b11000, 's'),
+        (0b11001, 't'),
+        (0b11010, 'u'),
+        (0b11011, 'v'),
+        (0b11100, 'w'),
+        (0b11101, 'x'),
+        (0b11110, 'y'),
+        (0b11111, 'z'),
+    ]);
+    let mut result = String::new();
+    let mut t = 0u8;
+    for n in 0..(bytes.len() * BITS_PER_BYTE) {
+        let i = n / BITS_PER_BYTE;
+        let p = n % BITS_PER_BYTE;
+        let ptr = bytes.get(i).unwrap();
+        t = (t << 1) | ((*ptr) >> (BITS_PER_BYTE - p - 1)) & 1u8;
+        if (n + 1) % 5 == 0 {
+            result.push(*map.get(&t).unwrap());
+            t = 0;
+        }
+    }
+    result
 }
 
 fn trace_binary_search(value: f64, range: (f64, f64), bits: usize) -> Vec<u8> {
